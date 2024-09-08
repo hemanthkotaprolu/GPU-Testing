@@ -23,10 +23,24 @@ from peft import (
     prepare_model_for_kbit_training, 
     get_peft_model
 )
-from trl import SFTTrainer
 import accelerate
 
 from optimum.habana import GaudiConfig, GaudiTrainer, GaudiTrainingArguments
+
+instruction = """
+Read the input text carefully and identify the emotion of the text. After identifying the emotion output the serial number of the emotion. The emotions that you need to choose from along with defenitions are:
+0) Anger - Feeling upset, mad, or annoyed.
+1) Anticipation - Looking forward to something, eager or excited about what's to come.
+2) Joy - Feeling happy, cheerful, or pleased.
+3) Trust - Feeling safe, confident, or positive towards someone or something.
+4) Fear - Feeling scared, anxious, or worried.
+5) Surprise - Feeling shocked or startled by something unexpected.
+6) Sadness - Feeling unhappy, sorrowful, or down.
+7) Disgust - Feeling disgusted, repulsed, or strongly disapproving.
+8) Neutral - Feeling nothing in particular, indifferent or without strong emotions.
+
+For example, if the identified emotion is Joy, the output has to be 2, since the serial number of joy is 2.
+"""
 
 def convert_to_alpaca(item):
     return "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n" + f"### Instruction:\n{instruction}\n\n### Input:\n{item['input']}\n\n### Response:\n{item['output']}"
