@@ -26,6 +26,11 @@ from peft import (
 )
 import accelerate
 from optimum.habana import GaudiConfig, GaudiTrainer, GaudiTrainingArguments
+import wandb
+
+os.environ["WANDB_PROJECT"] = "Instruction_tuning_emotion_detection"
+os.environ["WANDB_LOG_MODEL"]="checkpoint"
+os.environ["WANDB_WATCH"]="false"
 
 instruction = """
 Read the input text carefully and identify the emotion of the text. After identifying the emotion output the serial number of the emotion. The emotions that you need to choose from along with defenitions are:
@@ -106,7 +111,7 @@ training_arguments = TrainingArguments(
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
         lr_scheduler_type ='cosine',
-        # report_to="wanb",
+        report_to="wanb",
         learning_rate=1e-5,
         weight_decay=0.01,
         warmup_steps = 10,
