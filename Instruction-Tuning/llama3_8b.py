@@ -143,6 +143,9 @@ trainer = GaudiTrainer(
             preprocess_logits_for_metrics=preprocess_logits_for_metrics
             )
 
+print(train_dataset)
+print("*"*50)
+
 trainer.train()
 
 results = trainer.evaluate()
