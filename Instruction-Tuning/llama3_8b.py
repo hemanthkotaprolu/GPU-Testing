@@ -43,8 +43,6 @@ For example, if the identified emotion is Joy, the output has to be 2, since the
 """
 
 dataset = load_dataset('hemanthkotaprolu/goemotions-plutchiks')
-train_dataset = dataset['train']
-train_dataset = train_dataset.map(lambda item: {'text': template(item, pipeline)})
 
 base_model = "meta-llama/Meta-Llama-3-8B-Instruct"
 new_model = "./models/Llama3_8b_instruct_finetuned_e5_lr_5_bs_4"
@@ -76,6 +74,9 @@ def template(item):
     prompt = tokenizer.apply_chat_template(chat, tokenize=False)
     return prompt
 
+
+train_dataset = dataset['train']
+train_dataset = train_dataset.map(lambda item: {'text': template(item, pipeline)})
 # pipeline = transformers.pipeline(
 #     "text-generation",
 #     model=base_model,
