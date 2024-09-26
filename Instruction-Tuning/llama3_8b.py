@@ -131,30 +131,6 @@ trainer = GaudiTrainer(
             preprocess_logits_for_metrics=preprocess_logits_for_metrics if training_args.do_eval else None,
         )
 
-# training_args = GaudiTrainingArguments(
-#     per_device_train_batch_size=8,
-#     per_device_eval_batch_size=8,
-#     num_train_epochs=5,
-#     learning_rate=1e-5,
-#     weight_decay=0.01,
-#     save_strategy="epoch",
-#     output_dir='./logs/llama3_8b_lr5_e5_bs8',
-#     use_habana=True,
-#     use_lazy_mode=True,
-#     GaudiConfig=""
-# )
-
-
-# trainer = GaudiTrainer(
-#     model=model,
-#     train_dataset=train_dataset,
-#     tokenizer=tokenizer,
-#     args=training_args,
-#     packing=False,
-#     dataset_text_config="text",
-#     peft_config=peft_config
-# )
-
 trainer.train()
 
 results = trainer.evaluate()
