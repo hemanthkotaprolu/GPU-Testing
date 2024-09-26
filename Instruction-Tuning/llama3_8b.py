@@ -76,7 +76,7 @@ def template(item):
 
 
 train_dataset = dataset['train']
-train_dataset = train_dataset.map(lambda item: {'text': template(item, pipeline)})
+train_dataset = train_dataset.map(lambda item: {'text': template(item)})
 # pipeline = transformers.pipeline(
 #     "text-generation",
 #     model=base_model,
