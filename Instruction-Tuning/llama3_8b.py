@@ -58,6 +58,7 @@ model.config.pretraining_tp = 1
 model.gradient_checkpointing_enable()
 model.generation_config.attn_softmax_bf16 = True
 model.generation_config.use_flash_attention = True
+model.generation_config.flash_attention_recompute = True
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
