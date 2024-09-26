@@ -52,9 +52,11 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map="auto",
     trust_remote_code=True
 )
+
 model.config.use_cache = False # silence the warnings
 model.config.pretraining_tp = 1
 model.gradient_checkpointing_enable()
+model.generation_config.attn_softmax_bf16 = True
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
