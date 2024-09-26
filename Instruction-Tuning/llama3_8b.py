@@ -53,14 +53,15 @@ model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True
 )
 
-model.config.use_cache = False # silence the warnings
-model.config.pretraining_tp = 1
-model.gradient_checkpointing_enable()
-model.generation_config.attn_softmax_bf16 = False
-model.generation_config.use_flash_attention = False
-model.generation_config.flash_attention_recompute = False
-model.generation_config.flash_attention_causal_mask = False
-model.generation_config.use_fused_rope = False
+if "llama" in base_model.lower():
+    model.config.use_cache = False # silence the warnings
+    model.config.pretraining_tp = 1
+    model.gradient_checkpointing_enable()
+    model.generation_config.attn_softmax_bf16 = False
+    model.generation_config.use_flash_attention = False
+    model.generation_config.flash_attention_recompute = False
+    model.generation_config.flash_attention_causal_mask = False
+    model.generation_config.use_fused_rope = False
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
@@ -134,13 +135,9 @@ trainer = GaudiTrainer(
             data_collator=data_collator,
             )
 
-print(train_dataset)
-print("*"*50)
-
 trainer.train()
 
-results = trainer.evaluate()
-output_dir = "./fine_tuned_model"
+output_dir = f"./fine_tuned_model/{new_model}"
+
 model.save_pretrained(output_dir)
 tokenizer.save_pretrained(output_dir)
-print(results)
