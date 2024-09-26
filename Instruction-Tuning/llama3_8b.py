@@ -100,7 +100,7 @@ gaudi_config = GaudiConfig()
 gaudi_config.use_fused_adam = True
 gaudi_config.use_fused_clip_norm = True
 
-training_arguments = TrainingArguments(
+training_arguments = GaudiTrainingArguments(
         save_strategy="epoch",
         output_dir="./logs/Llama3_8b_instruct_finetuned_e5_lr_5_bs_4_cp/",
         num_train_epochs=3,
