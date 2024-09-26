@@ -56,9 +56,11 @@ model = AutoModelForCausalLM.from_pretrained(
 model.config.use_cache = False # silence the warnings
 model.config.pretraining_tp = 1
 model.gradient_checkpointing_enable()
-model.generation_config.attn_softmax_bf16 = True
-model.generation_config.use_flash_attention = True
-model.generation_config.flash_attention_recompute = True
+model.generation_config.attn_softmax_bf16 = False
+model.generation_config.use_flash_attention = False
+model.generation_config.flash_attention_recompute = False
+model.generation_config.flash_attention_causal_mask = False
+model.generation_config.use_fused_rope = False
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
