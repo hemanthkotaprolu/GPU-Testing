@@ -76,6 +76,11 @@ def template(item, eval):
     prompt = tokenizer.apply_chat_template(chat, tokenize=False)
     return prompt
 
+def tokenize_function(examples):
+    results =  tokenizer(examples['text'], padding="max_length", truncation=True, return_tensors='pt', max_length=512)
+    results['labels'] = results['input_ids']
+    return result
+
 def compute_metrics(eval_preds):
     preds, labels = eval_preds
     # preds have the same shape as the labels, after the argmax(-1) has been calculated
@@ -96,7 +101,9 @@ def preprocess_logits_for_metrics(logits, labels):
 
 train_dataset = dataset['train']
 train_dataset = train_dataset.map(lambda item: {'text': template(item, eval=False)})
-eval_dataset = train_dataset.map(lambda item: {'text': template(item, eval=True)})
+
+tokenized_dataset = train_dataset.map(tokenize_function, batched=True)\
+        .remove_columns(['text', 'id','output', 'input'])
 
 peft_config = LoraConfig(
                 r=16,
@@ -135,12 +142,8 @@ trainer = GaudiTrainer(
             model=lora_model,
             gaudi_config=gaudi_config,
             args=training_arguments,
-            train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
-            tokenizer=tokenizer,
+            train_dataset=tokenized_dataset,
             data_collator=data_collator,
-            compute_metrics=compute_metrics, 
-            preprocess_logits_for_metrics=preprocess_logits_for_metrics
             )
 
 print(train_dataset)
