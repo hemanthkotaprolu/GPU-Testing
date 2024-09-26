@@ -7,15 +7,14 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
 from datasets import Dataset, load_dataset
 from transformers import (
-    T5ForConditionalGeneration, 
-    T5Tokenizer, 
     AutoModelForCausalLM, 
     AutoTokenizer, 
     BitsAndBytesConfig,
     HfArgumentParser,
     TrainingArguments, 
     Trainer, 
-    pipeline
+    pipeline,
+    DataCollatorForLanguageModeling
 )
 from peft import (
     LoraConfig, 
@@ -67,22 +66,37 @@ model.config.pad_token_id = tokenizer.pad_token_id
 def convert_to_alpaca(item):
     return "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n" + f"### Instruction:\n{instruction}\n\n### Input:\n{item['input']}\n\n### Response:\n{item['output']}"
 
-def template(item):
-    chat = [{"role": "user", "content": instruction + item["input"]},{"role": "assistant", "content": item["output"]}]
+def template(item, eval):
+    if eval:
+        chat = [{'role': 'user', 'content': instruction + item['input']}]
+    else:
+        chat = [{"role": "user", "content": instruction + item["input"]},{"role": "assistant", "content": item["output"]}]
 
     # prompt = pipeline.tokenizer.apply_chat_template(chat, tokenize=False)
     prompt = tokenizer.apply_chat_template(chat, tokenize=False)
     return prompt
 
+def compute_metrics(eval_preds):
+    preds, labels = eval_preds
+    # preds have the same shape as the labels, after the argmax(-1) has been calculated
+    # by preprocess_logits_for_metrics but we need to shift the labels
+    labels = labels[:, 1:].reshape(-1)
+    preds = preds[:, :-1].reshape(-1)
+    mask = labels != -100
+    labels = labels[mask]
+    preds = preds[mask]
+    return metric.compute(predictions=preds, references=labels)
+
+def preprocess_logits_for_metrics(logits, labels):
+    if isinstance(logits, tuple):
+        # Depending on the model and config, logits may contain extra tensors,
+        # like past_key_values, but logits always come first
+        logits = logits[0]
+    return logits.argmax(dim=-1)
 
 train_dataset = dataset['train']
-train_dataset = train_dataset.map(lambda item: {'text': template(item)})
-# pipeline = transformers.pipeline(
-#     "text-generation",
-#     model=base_model,
-#     model_kwargs={"torch_dtype": torch.bfloat16},
-#     device_map="auto",
-# )
+train_dataset = train_dataset.map(lambda item: {'text': template(item, eval=False)})
+eval_dataset = train_dataset.map(lambda item: {'text': template(item, eval=True)})
 
 peft_config = LoraConfig(
                 r=16,
@@ -99,6 +113,8 @@ lora_model.print_trainable_parameters()
 gaudi_config = GaudiConfig()
 gaudi_config.use_fused_adam = True
 gaudi_config.use_fused_clip_norm = True
+
+data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8, return_tensors="pt", mlm=False)
 
 training_arguments = GaudiTrainingArguments(
         save_strategy="epoch",
@@ -119,13 +135,13 @@ trainer = GaudiTrainer(
             model=lora_model,
             gaudi_config=gaudi_config,
             args=training_arguments,
-            train_dataset=train_dataset if training_args.do_train else None,
-            eval_dataset=eval_dataset if training_args.do_eval else None,
+            train_dataset=train_dataset,
+            eval_dataset=eval_dataset,
             tokenizer=tokenizer,
             data_collator=data_collator,
-            compute_metrics=compute_metrics if training_args.do_eval else None,
-            preprocess_logits_for_metrics=preprocess_logits_for_metrics if training_args.do_eval else None,
-        )
+            compute_metrics=compute_metrics, 
+            preprocess_logits_for_metrics=preprocess_logits_for_metrics
+            )
 
 trainer.train()
 
