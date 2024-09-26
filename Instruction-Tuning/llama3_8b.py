@@ -112,7 +112,7 @@ training_arguments = TrainingArguments(
         weight_decay=0.01,
         warmup_steps = 10,
         use_habana=True,
-        use_lazy_mode=true,
+        use_lazy_mode=True,
     )
 
 trainer = GaudiTrainer(
