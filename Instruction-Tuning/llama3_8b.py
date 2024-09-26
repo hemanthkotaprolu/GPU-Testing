@@ -42,22 +42,6 @@ Read the input text carefully and identify the emotion of the text. After identi
 For example, if the identified emotion is Joy, the output has to be 2, since the serial number of joy is 2.
 """
 
-def convert_to_alpaca(item):
-    return "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n" + f"### Instruction:\n{instruction}\n\n### Input:\n{item['input']}\n\n### Response:\n{item['output']}"
-
-def template(item, pipeline):
-    chat = [{"role": "user", "content": instruction + item["input"]},{"role": "assistant", "content": item["output"]}]
-
-    prompt = pipeline.tokenizer.apply_chat_template(chat, tokenize=False)
-    return prompt
-
-pipeline = transformers.pipeline(
-    "text-generation",
-    model=base_model,
-    model_kwargs={"torch_dtype": torch.bfloat16},
-    device_map="auto",
-)
-
 dataset = load_dataset('hemanthkotaprolu/goemotions-plutchiks')
 train_dataset = dataset['train']
 train_dataset = train_dataset.map(lambda item: {'text': template(item, pipeline)})
@@ -81,6 +65,23 @@ tokenizer.pad_token = tokenizer.eos_token
 
 model.resize_token_embeddings(len(tokenizer))
 model.config.pad_token_id = tokenizer.pad_token_id
+
+def convert_to_alpaca(item):
+    return "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n" + f"### Instruction:\n{instruction}\n\n### Input:\n{item['input']}\n\n### Response:\n{item['output']}"
+
+def template(item):
+    chat = [{"role": "user", "content": instruction + item["input"]},{"role": "assistant", "content": item["output"]}]
+
+    # prompt = pipeline.tokenizer.apply_chat_template(chat, tokenize=False)
+    prompt = tokenizer.apply_chat_template(chat, tokenize=False)
+    return prompt
+
+# pipeline = transformers.pipeline(
+#     "text-generation",
+#     model=base_model,
+#     model_kwargs={"torch_dtype": torch.bfloat16},
+#     device_map="auto",
+# )
 
 peft_config = LoraConfig(
                 r=16,
