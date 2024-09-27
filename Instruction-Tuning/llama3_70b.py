@@ -9,7 +9,8 @@ from typing import Union
 from datasets import Dataset, load_dataset
 import transformers
 from transformers import (
-    AutoModelForCausalLM, 
+    LlamaForCausalLM,
+    # AutoModelForCausalLM, 
     AutoTokenizer, 
     BitsAndBytesConfig,
     HfArgumentParser,
@@ -59,7 +60,7 @@ new_model = "./models/Llama31_70b_instruct_finetuned_e1"
 #     "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
 # }
 
-model = AutoModelForCausalLM.from_pretrained(
+model = LlamaForCausalLM.from_pretrained(
     base_model,
     torch_dtype=torch.bfloat16,
     device_map="auto",
