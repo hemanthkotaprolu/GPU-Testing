@@ -52,11 +52,19 @@ dataset = load_dataset('hemanthkotaprolu/goemotions-plutchiks')
 base_model = "meta-llama/Llama-3.1-70B-Instruct"
 new_model = "./models/Llama31_70b_instruct_finetuned_e1"
 
+stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
+generation_kwargs = {
+    # "max_length": 100,  # Maximum length of the generated text
+    # "max_new_tokens": 10,  # Maximum number of new tokens to generate
+    "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
+}
+
 model = AutoModelForCausalLM.from_pretrained(
     base_model,
     torch_dtype=torch.bfloat16,
     device_map="auto",
-    trust_remote_code=True
+    trust_remote_code=True,
+    **generation_kwargs
 )
 
 if "llama" in base_model.lower():
@@ -70,6 +78,7 @@ if "llama" in base_model.lower():
     model.generation_config.use_fused_rope = False
     # stopping_criteria = StoppingCriteriaList()
     # model.generate.stopping_criteria=stopping_criteria
+    
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
@@ -119,13 +128,6 @@ gaudi_config.use_fused_adam = True
 gaudi_config.use_fused_clip_norm = True
 
 data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8, return_tensors="pt", mlm=False)
-
-stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
-generation_kwargs = {
-    # "max_length": 100,  # Maximum length of the generated text
-    # "max_new_tokens": 10,  # Maximum number of new tokens to generate
-    "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
-}
 
 
 training_arguments = GaudiTrainingArguments(
