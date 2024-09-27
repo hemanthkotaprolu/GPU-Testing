@@ -28,6 +28,17 @@ from peft import (
 import accelerate
 from optimum.habana import GaudiConfig, GaudiTrainer, GaudiTrainingArguments
 
+def gaudi_MaxNewTokensCriteria_call(
+    self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
+) -> Union[torch.BoolTensor, bool]:
+    token_idx = kwargs.get("token_idx", None)
+    if token_idx is not None:
+        assert not kwargs["needs_tensor_output"]
+        return token_idx >= self.max_length
+    else:
+        is_done = input_ids.shape[-1] >= self.max_length
+        return create_return_const_tensor(input_ids, is_done)
+
 instruction = """
 Read the input text carefully and identify the emotion of the text. After identifying the emotion output the serial number of the emotion. The emotions that you need to choose from along with defenitions are:
 0) Anger - Feeling upset, mad, or annoyed.
@@ -65,8 +76,7 @@ if "llama" in base_model.lower():
     model.generation_config.flash_attention_causal_mask = False
     model.generation_config.use_fused_rope = False
     
-    stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
-    model.generation_config.stopping_criteria=stopping_criteria
+    transformers.generation.MaxNewTokensCriteria.__call__ = gaudi_MaxNewTokensCriteria_call
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
