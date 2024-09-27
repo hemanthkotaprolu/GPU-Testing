@@ -123,8 +123,8 @@ data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8,
 stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
 generation_kwargs = {
     # "max_length": 100,  # Maximum length of the generated text
-    "max_new_tokens": 10,  # Maximum number of new tokens to generate
-    # "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
+    # "max_new_tokens": 10,  # Maximum number of new tokens to generate
+    "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
 }
 
 
