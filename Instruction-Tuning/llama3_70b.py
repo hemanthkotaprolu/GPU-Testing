@@ -20,6 +20,15 @@ from transformers import (
     StoppingCriteriaList, 
     MaxTimeCriteria
 )
+from transformers.generation import (
+        EosTokenCriteria,
+        MaxLengthCriteria,
+        MaxNewTokensCriteria,
+        MaxTimeCriteria,
+        StoppingCriteriaList,
+        validate_stopping_criteria,
+    )
+
 from peft import (
     LoraConfig, 
     PeftModel, 
@@ -78,8 +87,8 @@ if "llama" in base_model.lower():
     model.generation_config.flash_attention_recompute = False
     model.generation_config.flash_attention_causal_mask = False
     model.generation_config.use_fused_rope = False
-    
-    transformers.generation.MaxNewTokensCriteria.__call__ = gaudi_MaxNewTokensCriteria_call
+    stopping_criteria = StoppingCriteriaList()
+    model.generation.stopping_criteria=stopping_criteria
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
