@@ -120,6 +120,14 @@ gaudi_config.use_fused_clip_norm = True
 
 data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8, return_tensors="pt", mlm=False)
 
+stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
+generation_kwargs = {
+    "max_length": 100,  # Maximum length of the generated text
+    "max_new_tokens": 10,  # Maximum number of new tokens to generate
+    "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
+}
+
+
 training_arguments = GaudiTrainingArguments(
         evaluation_strategy='epoch',
         save_strategy="epoch",
@@ -134,7 +142,7 @@ training_arguments = GaudiTrainingArguments(
         warmup_steps = 10,
         use_habana=True,
         use_lazy_mode=True,
-        stopping_criteria=StoppingCriteriaList([MaxTimeCriteria(32)])
+        **generation_kwargs
     )
 
 trainer = GaudiTrainer(
