@@ -68,7 +68,8 @@ model = AutoModelForCausalLM.from_pretrained(
     base_model,
     torch_dtype=torch.bfloat16,
     device_map="auto",
-    trust_remote_code=True
+    trust_remote_code=True,
+    stopping_criteria=StoppingCriteriaList()
 )
 
 if "llama" in base_model.lower():
@@ -80,8 +81,7 @@ if "llama" in base_model.lower():
     model.generation_config.flash_attention_recompute = False
     model.generation_config.flash_attention_causal_mask = False
     model.generation_config.use_fused_rope = False
-    stopping_criteria = StoppingCriteriaList()
-    model.generate.stopping_criteria=stopping_criteria
+    # model.generate.stopping_criteria=stopping_criteria
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
