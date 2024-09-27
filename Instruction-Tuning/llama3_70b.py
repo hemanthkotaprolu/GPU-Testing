@@ -81,7 +81,7 @@ if "llama" in base_model.lower():
     model.generation_config.flash_attention_causal_mask = False
     model.generation_config.use_fused_rope = False
     stopping_criteria = StoppingCriteriaList()
-    model.generation.stopping_criteria=stopping_criteria
+    model.generate.stopping_criteria=stopping_criteria
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
 tokenizer.padding_side = 'right'
