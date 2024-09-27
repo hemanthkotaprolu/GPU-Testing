@@ -20,14 +20,7 @@ from transformers import (
     StoppingCriteriaList, 
     MaxTimeCriteria
 )
-from transformers.generation import (
-        EosTokenCriteria,
-        MaxLengthCriteria,
-        MaxNewTokensCriteria,
-        MaxTimeCriteria,
-        StoppingCriteriaList,
-        validate_stopping_criteria,
-    )
+from transformers.generation import StoppingCriteriaList
 
 from peft import (
     LoraConfig, 
