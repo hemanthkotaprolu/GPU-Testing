@@ -52,19 +52,19 @@ dataset = load_dataset('hemanthkotaprolu/goemotions-plutchiks')
 base_model = "meta-llama/Llama-3.1-70B-Instruct"
 new_model = "./models/Llama31_70b_instruct_finetuned_e1"
 
-stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
-generation_kwargs = {
-    # "max_length": 100,  # Maximum length of the generated text
-    # "max_new_tokens": 10,  # Maximum number of new tokens to generate
-    "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
-}
+# stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
+# generation_kwargs = {
+#     # "max_length": 100,  # Maximum length of the generated text
+#     # "max_new_tokens": 10,  # Maximum number of new tokens to generate
+#     "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
+# }
 
 model = AutoModelForCausalLM.from_pretrained(
     base_model,
     torch_dtype=torch.bfloat16,
     device_map="auto",
     trust_remote_code=True,
-    **generation_kwargs
+    # **generation_kwargs
 )
 
 if "llama" in base_model.lower():
