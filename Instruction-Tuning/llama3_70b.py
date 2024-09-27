@@ -144,7 +144,6 @@ training_arguments = GaudiTrainingArguments(
         warmup_steps = 10,
         use_habana=True,
         use_lazy_mode=True,
-        **generation_kwargs
     )
 
 trainer = GaudiTrainer(
