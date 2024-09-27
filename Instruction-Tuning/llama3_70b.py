@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
+from typing import Union
 
 from datasets import Dataset, load_dataset
 from transformers import (
@@ -27,6 +28,7 @@ from peft import (
 )
 import accelerate
 from optimum.habana import GaudiConfig, GaudiTrainer, GaudiTrainingArguments
+
 
 def gaudi_MaxNewTokensCriteria_call(
     self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
