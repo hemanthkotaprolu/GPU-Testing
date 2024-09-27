@@ -113,6 +113,7 @@ gaudi_config.use_fused_clip_norm = True
 data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8, return_tensors="pt", mlm=False)
 
 training_arguments = GaudiTrainingArguments(
+        evaluation_strategy='epoch',
         save_strategy="epoch",
         output_dir="./logs/Llama3_8b_instruct_finetuned_e5_lr_5_bs_4_cp/",
         num_train_epochs=3,
