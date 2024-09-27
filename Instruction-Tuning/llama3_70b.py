@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from typing import Union
 
 from datasets import Dataset, load_dataset
+import transformers
 from transformers import (
     AutoModelForCausalLM, 
     AutoTokenizer, 
