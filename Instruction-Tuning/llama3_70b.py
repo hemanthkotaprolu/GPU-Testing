@@ -20,7 +20,7 @@ from transformers import (
     StoppingCriteriaList, 
     MaxTimeCriteria
 )
-from transformers.generation import StoppingCriteriaList
+from transformers.generation import StoppingCriteriaList, MaxTimeCriteria
 
 from peft import (
     LoraConfig, 
@@ -31,18 +31,6 @@ from peft import (
 )
 import accelerate
 from optimum.habana import GaudiConfig, GaudiTrainer, GaudiTrainingArguments
-
-
-def gaudi_MaxNewTokensCriteria_call(
-    self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
-) -> Union[torch.BoolTensor, bool]:
-    token_idx = kwargs.get("token_idx", None)
-    if token_idx is not None:
-        assert not kwargs["needs_tensor_output"]
-        return token_idx >= self.max_length
-    else:
-        is_done = input_ids.shape[-1] >= self.max_length
-        return create_return_const_tensor(input_ids, is_done)
 
 instruction = """
 Read the input text carefully and identify the emotion of the text. After identifying the emotion output the serial number of the emotion. The emotions that you need to choose from along with defenitions are:
@@ -68,8 +56,7 @@ model = AutoModelForCausalLM.from_pretrained(
     base_model,
     torch_dtype=torch.bfloat16,
     device_map="auto",
-    trust_remote_code=True,
-    stopping_criteria=StoppingCriteriaList()
+    trust_remote_code=True
 )
 
 if "llama" in base_model.lower():
@@ -81,6 +68,7 @@ if "llama" in base_model.lower():
     model.generation_config.flash_attention_recompute = False
     model.generation_config.flash_attention_causal_mask = False
     model.generation_config.use_fused_rope = False
+    # stopping_criteria = StoppingCriteriaList()
     # model.generate.stopping_criteria=stopping_criteria
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
@@ -146,6 +134,7 @@ training_arguments = GaudiTrainingArguments(
         warmup_steps = 10,
         use_habana=True,
         use_lazy_mode=True,
+        stopping_criteria=StoppingCriteriaList([MaxTimeCriteria(32)])
     )
 
 trainer = GaudiTrainer(
