@@ -51,21 +51,13 @@ For example, if the identified emotion is Joy, the output has to be 2, since the
 dataset = load_dataset('hemanthkotaprolu/goemotions-plutchiks')
 
 base_model = "meta-llama/Llama-3.1-70B-Instruct"
-new_model = "./models/Llama31_70b_instruct_finetuned_e1"
-
-# stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(32)])
-# generation_kwargs = {
-#     # "max_length": 100,  # Maximum length of the generated text
-#     # "max_new_tokens": 10,  # Maximum number of new tokens to generate
-#     "generation_kwargs": {"stopping_criteria": stopping_criteria}  # Add stopping criteria to generation_kwargs
-# }
+new_model = "./models/Llama3_70b_instruct_finetuned_e1"
 
 model = LlamaForCausalLM.from_pretrained(
     base_model,
     torch_dtype=torch.bfloat16,
     device_map="auto",
     trust_remote_code=True,
-    # **generation_kwargs
 )
 
 if "llama" in base_model.lower():
@@ -76,9 +68,6 @@ if "llama" in base_model.lower():
     model.generation_config.use_flash_attention = False
     model.generation_config.flash_attention_recompute = False
     model.generation_config.flash_attention_causal_mask = False
-    model.generation_config.use_fused_rope = False
-    # stopping_criteria = StoppingCriteriaList()
-    # model.generate.stopping_criteria=stopping_criteria
     
 
 tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
@@ -134,8 +123,8 @@ data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8,
 training_arguments = GaudiTrainingArguments(
         evaluation_strategy='epoch',
         save_strategy="epoch",
-        output_dir="./logs/Llama3_8b_instruct_finetuned_e5_lr_5_bs_4_cp/",
-        num_train_epochs=3,
+        output_dir="./logs/Llama3_70b_instruct_finetuned_e1/",
+        num_train_epochs=1,
         gradient_accumulation_steps = 4,
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
