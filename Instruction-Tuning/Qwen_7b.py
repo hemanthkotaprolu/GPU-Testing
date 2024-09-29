@@ -44,7 +44,7 @@ For example, if the identified emotion is Joy, the output has to be 2, since the
 dataset = load_dataset('hemanthkotaprolu/goemotions-plutchiks')
 
 base_model = "Qwen/Qwen2.5-7B-Instruct"
-new_model = "./models/Qwen25_7b_Instruct_finetuned_e1"
+new_model = "./models/Qwen25_7b_Instruct_finetuned_e2"
 
 model = AutoModelForCausalLM.from_pretrained(
     base_model,
@@ -117,7 +117,7 @@ data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8,
 training_arguments = GaudiTrainingArguments(
         save_strategy="epoch",
         output_dir="./logs/Qwen25_7b_Instruct_finetuned_e1/",
-        num_train_epochs=3,
+        num_train_epochs=1,
         gradient_accumulation_steps = 4,
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
