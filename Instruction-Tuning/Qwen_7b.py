@@ -77,8 +77,8 @@ def template(item, eval):
     if eval:
         chat = [{'role': 'user', 'content': instruction + item['input']}]
     else:
-        print(type(item['output']), type(item['input']))
-        chat = [{"role": "user", "content": instruction + item["input"]},{"role": "assistant", "content": item["output"]}]
+        # print(type(item['output']), type(item['input']))
+        chat = [{"role": "user", "content": instruction + str(item["input"])},{"role": "assistant", "content": str(item["output"])}]
 
     # prompt = pipeline.tokenizer.apply_chat_template(chat, tokenize=False)
     prompt = tokenizer.apply_chat_template(chat, tokenize=False)
@@ -90,7 +90,7 @@ def tokenize_function(examples):
     return results
 
 train_dataset = dataset['train']
-print(type(train_dataset[0]['input']), type(train_dataset[0]['output']))
+# print(type(train_dataset[0]['input']), type(train_dataset[0]['output']))
 train_dataset = train_dataset.map(lambda item: {'text': template(item, eval=False)})
 
 tokenized_dataset = train_dataset.map(tokenize_function, batched=True)\
