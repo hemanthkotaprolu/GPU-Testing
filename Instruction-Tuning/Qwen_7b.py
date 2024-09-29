@@ -117,7 +117,7 @@ data_collator = DataCollatorForLanguageModeling(tokenizer, pad_to_multiple_of=8,
 training_arguments = GaudiTrainingArguments(
         save_strategy="epoch",
         output_dir="./logs/Qwen25_7b_Instruct_finetuned_e1/",
-        num_train_epochs=1,
+        num_train_epochs=2,
         gradient_accumulation_steps = 4,
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
