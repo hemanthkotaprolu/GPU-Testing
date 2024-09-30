@@ -16,7 +16,7 @@ import shutil
 model_name = "Qwen/Qwen2.5-7B-Instruct"
 new_model = "/home/fine_tuned_model/models/Qwen25_7b_Instruct_finetuned_e1"
 
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name, return_tensors="pt", return_token_type_ids=False)
 model = AutoModelForCausalLM.from_pretrained(new_model, device_map="auto")
 
 dataset = load_dataset("hemanthkotaprolu/goemotions-plutchiks")
@@ -67,7 +67,7 @@ for i in tqdm.tqdm(range(len(texts))):
                             do_sample=True,
                             temperature=0.2, 
                             max_new_tokens=10,
-                            lazy_mode=True, 
+                            # lazy_mode=True, 
                             pad_token_id=tokenizer.eos_token_id)
     output_text = tokenizer.batch_decode(outputs)
     response = output_text[0][len(prompt)+17:]
