@@ -18,7 +18,7 @@ import habana_frameworks.torch.core as htcore
 
 device=torch.device("hpu")
 model_name = "Qwen/Qwen2.5-7B-Instruct"
-new_model = "/home/fine_tuned_model/models/Qwen25_7b_Instruct_finetuned_e1"
+new_model = "/home/fine_tuned_model/models/Qwen25_7b_Instruct_finetuned_e2"
 
 tokenizer = AutoTokenizer.from_pretrained(model_name, return_tensors="pt", return_token_type_ids=False)
 model = AutoModelForCausalLM.from_pretrained(new_model, device_map="auto").to(device)
