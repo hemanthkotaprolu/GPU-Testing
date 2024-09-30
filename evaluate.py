@@ -61,6 +61,8 @@ for i in tqdm.tqdm(range(len(texts))):
     
     encodings = tokenizer(prompt,return_tensors="pt").to(model.device)
 
+    if 'token_type_ids' in encodings:
+        print("++++++++++++++++++Yes++++++++++++++++++")
     outputs = model.generate(**encodings, 
                             do_sample=True,
                             temperature=0.2, 
