@@ -13,7 +13,7 @@ import os
 import shutil
 
 
-device="hpu"
+device=torch.device("hpu")
 model_name = "Qwen/Qwen2.5-7B-Instruct"
 new_model = "/home/fine_tuned_model/models/Qwen25_7b_Instruct_finetuned_e1"
 
