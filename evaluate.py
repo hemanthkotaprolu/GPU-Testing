@@ -13,11 +13,13 @@ import os
 import shutil
 
 
+device="hpu:0"
 model_name = "Qwen/Qwen2.5-7B-Instruct"
 new_model = "/home/fine_tuned_model/models/Qwen25_7b_Instruct_finetuned_e1"
 
 tokenizer = AutoTokenizer.from_pretrained(model_name, return_tensors="pt", return_token_type_ids=False)
-model = AutoModelForCausalLM.from_pretrained(new_model, device_map="auto")
+model = AutoModelForCausalLM.from_pretrained(new_model, device_map="auto").to(device)
+
 
 dataset = load_dataset("hemanthkotaprolu/goemotions-plutchiks")
 testset = dataset["test"]
