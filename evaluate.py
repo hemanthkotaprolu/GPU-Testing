@@ -12,6 +12,9 @@ import re
 import os
 import shutil
 
+import habana_frameworks.torch as ht
+import habana_frameworks.torch.core as htcore
+
 
 device=torch.device("hpu")
 model_name = "Qwen/Qwen2.5-7B-Instruct"
